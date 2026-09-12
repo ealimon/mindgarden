@@ -1,7 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#FAF6EF"/>
-  <circle cx="256" cy="256" r="170" fill="#7C9885"/>
-  <path d="M256 340 C256 340 256 240 256 210" stroke="#FAF6EF" stroke-width="14" stroke-linecap="round"/>
-  <path d="M256 260 C256 260 200 240 190 190 C244 190 256 240 256 260 Z" fill="#D9A44A"/>
-  <path d="M256 230 C256 230 312 210 322 160 C268 160 256 210 256 230 Z" fill="#D48A6A"/>
+  <rect width="512" height="512" rx="112" fill="#5B4B8A"/>
+  <rect width="512" height="512" rx="112" fill="url(#bgGradient)" opacity="0.35"/>
+  <defs>
+    <radialGradient id="bgGradient" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#7A68B0"/>
+      <stop offset="100%" stop-color="#5B4B8A"/>
+    </radialGradient>
+  </defs>
+  <g transform="translate(256,258)">
+    <path d="M -8,-14 C -70,-95 -170,-95 -190,-30 C -205,18 -150,58 -80,40 C -40,30 -14,0 -8,-14 Z" fill="#E9C46A"/>
+    <path d="M 8,-14 C 70,-95 170,-95 190,-30 C 205,18 150,58 80,40 C 40,30 14,0 8,-14 Z" fill="#E9C46A"/>
+    <path d="M -6,10 C -50,55 -130,75 -150,35 C -168,0 -120,-25 -60,-8 C -30,0 -10,4 -6,10 Z" fill="#D9A44A"/>
+    <path d="M 6,10 C 50,55 130,75 150,35 C 168,0 120,-25 60,-8 C 30,0 10,4 6,10 Z" fill="#D9A44A"/>
+    <circle cx="-100" cy="-35" r="12" fill="#5B4B8A" opacity="0.55"/>
+    <circle cx="100" cy="-35" r="12" fill="#5B4B8A" opacity="0.55"/>
+    <circle cx="-95" cy="18" r="8" fill="#5B4B8A" opacity="0.45"/>
+    <circle cx="95" cy="18" r="8" fill="#5B4B8A" opacity="0.45"/>
+    <path d="M 0,-45 C 6,-45 9,-30 9,-10 C 9,20 6,55 0,58 C -6,55 -9,20 -9,-10 C -9,-30 -6,-45 0,-45 Z" fill="#3A362F"/>
+    <path d="M -3,-42 C -14,-58 -22,-64 -28,-62" stroke="#3A362F" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M 3,-42 C 14,-58 22,-64 28,-62" stroke="#3A362F" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <circle cx="-28" cy="-62" r="4" fill="#3A362F"/>
+    <circle cx="28" cy="-62" r="4" fill="#3A362F"/>
+  </g>
 </svg>
