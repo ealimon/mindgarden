@@ -27,7 +27,7 @@ const MODULES: ModuleDef[] = [
   {id: 'garden', title: 'Virtual Garden', description: 'Tap to plant and pick flowers in a calm garden.', accent: 'sage', emoji: '🌷', needsContent: false},
   {id: 'natureSounds', title: 'Nature Sounds', description: 'Rain, ocean, and birdsong to relax to.', accent: 'blue', emoji: '🎧', needsContent: false},
   {id: 'matching', title: 'Simple Matching', description: 'Find the matching pairs. No clock, no pressure.', accent: 'terracotta', emoji: '🃏', needsContent: false},
-  {id: 'coloring', title: 'Coloring & Painting', description: 'Tap to fill in gentle pictures with color.', accent: 'gold', emoji: '🎨', needsContent: false},
+  {id: 'coloring', title: 'Coloring & Painting', description: 'Choose a picture — flower, butterfly, bird, and more — and fill it with color.', accent: 'gold', emoji: '🎨', needsContent: false},
   {id: 'memoryLane', title: 'Memory Lane Photos', description: 'Family photos, with names to remember them by.', accent: 'sage', emoji: '📷', needsContent: true},
   {id: 'familyVoices', title: 'Family Voices', description: 'Short recorded messages from people who love you.', accent: 'terracotta', emoji: '💬', needsContent: true},
   {id: 'singAlong', title: 'Sing Along', description: 'Familiar old songs with the words on screen.', accent: 'blue', emoji: '🎵', needsContent: true},
@@ -401,21 +401,71 @@ function SimpleMatching() {
 }
 
 // ---------------------------------------------------------------------------
-// 5. Coloring & Painting — tap-to-fill simple SVG regions
+// 5. Coloring & Painting — a small picker, then tap-to-fill SVG regions.
+// Each design is its own tiny component so the line art can differ freely;
+// they all share the same palette, canvas frame, and reset behavior.
 // ---------------------------------------------------------------------------
-const PALETTE = ['#D9A44A', '#7C9885', '#7FA1B8', '#D48A6A', '#B98FC7', '#E7D9C0'];
+const PALETTE = ['#D9A44A', '#7C9885', '#7FA1B8', '#D48A6A', '#B98FC7', '#E7D9C0', '#8B7FC7', '#E8927C'];
+
+type ColoringDesignId = 'flower' | 'butterfly' | 'bird' | 'tree' | 'sun' | 'heart';
+
+const COLORING_DESIGNS: {id: ColoringDesignId; title: string; emoji: string}[] = [
+  {id: 'flower', title: 'Flower', emoji: '🌷'},
+  {id: 'butterfly', title: 'Butterfly', emoji: '🦋'},
+  {id: 'bird', title: 'Bird', emoji: '🐦'},
+  {id: 'tree', title: 'Tree', emoji: '🌳'},
+  {id: 'sun', title: 'Sun', emoji: '☀️'},
+  {id: 'heart', title: 'Heart', emoji: '💗'},
+];
 
 function ColoringPage() {
-  const [color, setColor] = useState(PALETTE[0]);
-  const [fills, setFills] = useState<Record<string, string>>({petal1: '#FFFFFF', petal2: '#FFFFFF', petal3: '#FFFFFF', petal4: '#FFFFFF', center: '#FFFFFF', stem: '#FFFFFF'});
+  const [design, setDesign] = useState<ColoringDesignId | null>(null);
 
+  if (!design) {
+    return (
+      <div>
+        <p className="text-xl mb-6 text-center" style={{color: 'var(--mg-ink-soft)'}}>
+          Choose a picture to color.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+          {COLORING_DESIGNS.map(d => (
+            <button
+              key={d.id}
+              onClick={() => setDesign(d.id)}
+              className="mg-tap rounded-[24px] p-6 flex flex-col items-center gap-2"
+              style={{background: '#FFFFFF'}}
+            >
+              <span className="text-5xl">{d.emoji}</span>
+              <span className="text-lg font-medium" style={{color: 'var(--mg-ink)'}}>{d.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return <ColoringCanvas design={design} onChooseAnother={() => setDesign(null)} />;
+}
+
+function ColoringCanvas({design, onChooseAnother}: {design: ColoringDesignId; onChooseAnother: () => void}) {
+  const [color, setColor] = useState(PALETTE[0]);
+  // Re-created fresh each time `design` changes, so switching pictures always starts blank.
+  const [fills, setFills] = useState<Record<string, string>>({});
   const fill = (part: string) => setFills(f => ({...f, [part]: color}));
+  const get = (part: string) => fills[part] ?? '#FFFFFF';
 
   return (
     <div>
-      <p className="text-xl mb-4 text-center" style={{color: 'var(--mg-ink-soft)'}}>
-        Pick a color, then tap a part of the flower to fill it in.
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xl" style={{color: 'var(--mg-ink-soft)'}}>Tap a part, then a color to fill it in.</p>
+        <button
+          onClick={onChooseAnother}
+          className="mg-tap rounded-2xl px-4 py-2 text-lg font-medium shrink-0"
+          style={{background: '#FFFFFF', color: 'var(--mg-ink)'}}
+        >
+          Choose Another
+        </button>
+      </div>
       <div className="flex justify-center gap-3 mb-8 flex-wrap">
         {PALETTE.map(c => (
           <button
@@ -430,14 +480,96 @@ function ColoringPage() {
       <div className="flex justify-center">
         <svg viewBox="0 0 200 200" width="320" height="320">
           <rect x="0" y="0" width="200" height="200" rx="24" fill="#FBF8F2" />
-          <rect onClick={() => fill('stem')} x="95" y="110" width="10" height="70" fill={fills.stem} stroke="#3A362F" strokeWidth="2" />
-          <circle onClick={() => fill('petal1')} cx="100" cy="60" r="26" fill={fills.petal1} stroke="#3A362F" strokeWidth="2" />
-          <circle onClick={() => fill('petal2')} cx="70" cy="90" r="26" fill={fills.petal2} stroke="#3A362F" strokeWidth="2" />
-          <circle onClick={() => fill('petal3')} cx="130" cy="90" r="26" fill={fills.petal3} stroke="#3A362F" strokeWidth="2" />
-          <circle onClick={() => fill('petal4')} cx="100" cy="105" r="26" fill={fills.petal4} stroke="#3A362F" strokeWidth="2" />
-          <circle onClick={() => fill('center')} cx="100" cy="85" r="16" fill={fills.center} stroke="#3A362F" strokeWidth="2" />
+          <ColoringArt design={design} get={get} fill={fill} />
         </svg>
       </div>
     </div>
   );
+}
+
+function ColoringArt({design, get, fill}: {design: ColoringDesignId; get: (part: string) => string; fill: (part: string) => void}) {
+  const stroke = {stroke: '#3A362F', strokeWidth: 2} as const;
+
+  switch (design) {
+    case 'flower':
+      return (
+        <>
+          <rect onClick={() => fill('stem')} x="95" y="110" width="10" height="70" fill={get('stem')} {...stroke} />
+          <circle onClick={() => fill('petal1')} cx="100" cy="60" r="26" fill={get('petal1')} {...stroke} />
+          <circle onClick={() => fill('petal2')} cx="70" cy="90" r="26" fill={get('petal2')} {...stroke} />
+          <circle onClick={() => fill('petal3')} cx="130" cy="90" r="26" fill={get('petal3')} {...stroke} />
+          <circle onClick={() => fill('petal4')} cx="100" cy="105" r="26" fill={get('petal4')} {...stroke} />
+          <circle onClick={() => fill('center')} cx="100" cy="85" r="16" fill={get('center')} {...stroke} />
+        </>
+      );
+
+    case 'butterfly':
+      return (
+        <>
+          <ellipse onClick={() => fill('wingTL')} cx="72" cy="72" rx="34" ry="26" transform="rotate(-25 72 72)" fill={get('wingTL')} {...stroke} />
+          <ellipse onClick={() => fill('wingTR')} cx="128" cy="72" rx="34" ry="26" transform="rotate(25 128 72)" fill={get('wingTR')} {...stroke} />
+          <ellipse onClick={() => fill('wingBL')} cx="80" cy="120" rx="24" ry="19" transform="rotate(-15 80 120)" fill={get('wingBL')} {...stroke} />
+          <ellipse onClick={() => fill('wingBR')} cx="120" cy="120" rx="24" ry="19" transform="rotate(15 120 120)" fill={get('wingBR')} {...stroke} />
+          <ellipse onClick={() => fill('body')} cx="100" cy="97" rx="6" ry="45" fill={get('body')} {...stroke} />
+          <path d="M96,58 C90,48 84,44 80,45" stroke="#3A362F" strokeWidth="2" fill="none" />
+          <path d="M104,58 C110,48 116,44 120,45" stroke="#3A362F" strokeWidth="2" fill="none" />
+        </>
+      );
+
+    case 'bird':
+      return (
+        <>
+          <ellipse onClick={() => fill('body')} cx="105" cy="115" rx="42" ry="30" fill={get('body')} {...stroke} />
+          <circle onClick={() => fill('head')} cx="65" cy="85" r="22" fill={get('head')} {...stroke} />
+          <path onClick={() => fill('wing')} d="M105,100 C130,95 150,105 150,125 C130,130 108,122 100,112 Z" fill={get('wing')} {...stroke} />
+          <path onClick={() => fill('tail')} d="M140,125 C165,120 175,110 178,100 C168,120 155,135 140,135 Z" fill={get('tail')} {...stroke} />
+          <path d="M45,82 L28,88 L45,94 Z" fill="#D9A44A" stroke="#3A362F" strokeWidth="2" />
+          <circle cx="58" cy="80" r="2.5" fill="#3A362F" />
+        </>
+      );
+
+    case 'tree':
+      return (
+        <>
+          <rect onClick={() => fill('trunk')} x="90" y="130" width="20" height="55" fill={get('trunk')} {...stroke} />
+          <circle onClick={() => fill('leavesLeft')} cx="65" cy="95" r="34" fill={get('leavesLeft')} {...stroke} />
+          <circle onClick={() => fill('leavesRight')} cx="135" cy="95" r="34" fill={get('leavesRight')} {...stroke} />
+          <circle onClick={() => fill('leavesTop')} cx="100" cy="65" r="38" fill={get('leavesTop')} {...stroke} />
+        </>
+      );
+
+    case 'sun':
+      return (
+        <>
+          <path
+            onClick={() => fill('rays')}
+            d="M100,10 L112,45 L145,25 L130,58 L168,55 L138,78 L170,100 L138,122 L168,145 L130,142 L145,175 L112,155 L100,190 L88,155 L55,175 L70,142 L32,145 L62,122 L30,100 L62,78 L32,55 L70,58 L55,25 L88,45 Z"
+            fill={get('rays')}
+            {...stroke}
+          />
+          <circle onClick={() => fill('center')} cx="100" cy="100" r="34" fill={get('center')} {...stroke} />
+        </>
+      );
+
+    case 'heart':
+      return (
+        <>
+          <path
+            onClick={() => fill('outer')}
+            d="M100,175 C40,135 20,95 35,68 C48,45 82,42 100,72 C118,42 152,45 165,68 C180,95 160,135 100,175 Z"
+            fill={get('outer')}
+            {...stroke}
+          />
+          <path
+            onClick={() => fill('inner')}
+            d="M100,150 C65,122 52,98 62,80 C70,66 88,65 100,84 C112,65 130,66 138,80 C148,98 135,122 100,150 Z"
+            fill={get('inner')}
+            {...stroke}
+          />
+        </>
+      );
+
+    default:
+      return null;
+  }
 }
