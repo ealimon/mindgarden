@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  /* Calm, warm palette — deliberately softer than a children's app */
+  --mg-cream: #FAF6EF;
+  --mg-cream-deep: #F3ECE0;
+  --mg-sage: #7C9885;
+  --mg-sage-deep: #5F7A68;
+  --mg-gold: #D9A44A;
+  --mg-gold-deep: #B8863A;
+  --mg-blue: #7FA1B8;
+  --mg-blue-deep: #5F8299;
+  --mg-terracotta: #D48A6A;
+  --mg-terracotta-deep: #B56C4E;
+  --mg-ink: #3A362F;
+  --mg-ink-soft: #5B564C;
+}
+
+html, body {
+  background: var(--mg-cream);
+  color: var(--mg-ink);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* Larger base type sizing — comfortable for aging eyes without extra config */
+body {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Gentle press feedback instead of hard game-style animation */
+.mg-tap {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.mg-tap:active {
+  transform: scale(0.97);
+}
+
+/* Respect reduced-motion preferences — important for a calm, low-stimulation app */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
