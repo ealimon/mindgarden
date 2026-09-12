@@ -108,10 +108,14 @@ jobs:
                 for (const t of targetSizes) {
                   await sharp(svgPath)
                     .resize(t.size, t.size)
+                    // Flatten onto an opaque background to strip the alpha
+                    // channel entirely — Apple rejects any App Store icon
+                    // that carries transparency info, even if fully opaque.
+                    .flatten({ background: "#5B4B8A" })
                     .png()
                     .toFile(path.join(iconsetDir, t.file));
                 }
-                console.log("✅ Successfully generated all iOS AppIcon sizes using Sharp from assets/icon.svg");
+                console.log("✅ Successfully generated all iOS AppIcon sizes (flattened, no alpha channel) from assets/icon.svg");
               }
             }
 
